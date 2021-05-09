@@ -6,20 +6,50 @@ import { io } from "socket.io-client";
 const ENDPOINT = "wss://tarea-3-websocket.2021-1.tallerdeintegracion.cl";
 import { Container } from 'rsuite';
 import Map from './map';
+import Chat from './chat';
 import colors from '../styles/colors';
 
 const Home = ({ height, width, isMobile }) => {
   const [isLoadingFlights, setIsLoadingFlights] = useState(true);
-  const [isSocketOn, setIsSocketOn] = useState(false);
+  const [isLoadingChat, setIsLoadingChat] = useState(true);
   const [flights, setFlights] = useState({})
   const [positions, setPositions] = useState([]);
-  const [sortedPositions, setSortedPositions] = useState([]);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [nickName, setNickName] = useState('User123');
   const debug = false;
-  let socket;
+  var socket;
 
+  const handleMessage = () => {
+    if (nickName.length > 0) {
+      if (newMessage.length > 0) {
+        if (!socket) {
+          const newSocket = io(ENDPOINT, {
+            path: '/flights'
+          });
+          newSocket.emit('CHAT', {
+            name: nickName,
+            message: newMessage,
+            date: '09/05/2021'
+          });
+          setTimeout(() => {
+            newSocket.disconnect()
+           } , 10000);
+        } else {
+          socket.emit('CHAT', {
+            name: nickName,
+            message: newMessage,
+            date: '09/05/2021'
+          });
+        }
+        setNewMessage('');
+      } else {
+        console.log('RELLENAR MENSAJE')
+      }
+    } else {
+      console.log('RELLENAR AUTOR')
+    }
+  }
   const handlePositions = (message) => {
     const { code } = message;
     if (!flights[code]) {
@@ -45,16 +75,17 @@ const Home = ({ height, width, isMobile }) => {
       formatFlights(message)    
     })
     socket.on('CHAT', (message) => {
-      console.log('MENSAJE', message)    
+      messages.push(message)
+      setMessages(messages);   
     })
     socket.on('POSITION', (message) => {
       handlePositions(message)
     })
     socket.emit('FLIGHTS');
+    setIsLoadingChat(false);
   }
   
   const disconnectSocket = () => {
-    console.log('DISCONECTED')
     socket.disconnect();
   }
 
@@ -74,8 +105,6 @@ const Home = ({ height, width, isMobile }) => {
     };
   }, [flights]);
 
-  // useEffect(() => reorderedPositions(), [positions])
-
   return (
     <Container >
       {isLoadingFlights  ? (
@@ -89,6 +118,16 @@ const Home = ({ height, width, isMobile }) => {
             width={width}
             positions={positions}
             flights={flights}
+            />
+          <Chat
+            height={height}
+            width={width}
+            handleMessage={handleMessage}
+            messages={messages}
+            newMessage={newMessage}
+            setNewMessage={setNewMessage}
+            nickName={nickName}
+            setNickName={setNickName}
             />
         </Container>
       )};

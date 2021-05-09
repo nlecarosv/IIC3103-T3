@@ -60,7 +60,7 @@ const Map = ({ height, width, isMobile, flights, positions }) => {
           ))}
         </Container>
       </Modal>
-      <MapContainer center={center} zoom={1} minZoom={1} scrollWheelZoom={true} po style={{height: height/2, width: width/2}}>
+      <MapContainer center={center} zoom={1} minZoom={1} scrollWheelZoom={true} style={{height: height/2}}>
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -84,13 +84,12 @@ const Map = ({ height, width, isMobile, flights, positions }) => {
             )
           })}
 
-        {Object.keys(sortedPositions).map((code) => {
+        {Object.keys(sortedPositions).map((code, index) => {
           const flightPositions = sortedPositions[code];
           const actualPosition = flightPositions[flightPositions.length - 1];
           const actualFlight = flights[code];
-          // console.log(actualFlight)
           return (
-            <Marker position={actualPosition} icon={myIcon}>
+            <Marker position={actualPosition} icon={myIcon} key={index.toString()}>
               <Popup>
                 Vuelo {actualFlight.code}
                 <br />

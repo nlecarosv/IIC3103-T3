@@ -7,6 +7,8 @@ import React, { useState, useLayoutEffect } from "react";
 import { Container } from "rsuite";
 import "rsuite/dist/styles/rsuite-default.css";
 import "rsuite/lib/styles/index.less";
+import 'leaflet/dist/leaflet.css';
+
 import Home from "./components/home";
 
 const isMobile =
@@ -35,7 +37,7 @@ const App = () => {
 
   const [width, height] = useMediaQuery();
   return (
-    <Container style={{ height: "100%" }}>
+    <Container style={{width}}>
       <Router id="container">
         {/* <Toolbar /> */}
         <Switch>
@@ -54,7 +56,7 @@ const App = () => {
               commonApiUrl={commonApiUrl} 
               width={width}
               height={height}
-              isMobil={isMobile}
+              isMobile={isMobile}
               {...props} />}
           />
         </Switch>

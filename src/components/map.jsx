@@ -1,21 +1,14 @@
-
-// La función useMediaQuery fue obtenida de https://stackoverflow.com/questions/19014250/rerender-view-on-browser-resize-with-react
-// isMobile: https://stackoverflow.com/questions/21660369/detectmobilebrowsers-how-to-add-ipad-co-detect-mobile-browsers-js
-
-import React, { useState, useEffect } from 'react';
-import { io } from "socket.io-client";
-const ENDPOINT = "wss://tarea-3-websocket.2021-1.tallerdeintegracion.cl";
-import { Container, Modal } from 'rsuite';
-import { MapContainer, TileLayer, Marker, Popup , Circle, CircleMarker, Polyline, Polygon, Rectangle} from 'react-leaflet'
+import React, { useState } from 'react';
+import { Container, IconButton, Modal, Icon as IconRsuite, Loader } from 'rsuite';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, } from 'react-leaflet'
 import { Icon } from 'leaflet'
-import colors from '../styles/colors';
 import '../styles/map.css';
 import planeColors from '../styles/plane-colors';
 
 const myIcon = new Icon({
   iconUrl: '/airplane.png',
   iconSize: [22, 22],
-  iconAnchor: [22, 22],
+  iconAnchor: [1, 1],
   popupAnchor: [-3, -76],
   // shadowUrl: 'my-icon-shadow.png',
   // shadowSize: [68, 95],
@@ -34,79 +27,124 @@ const reorderPositions = (positionsToSort) => {
   return temporalSortedPositions;
 }
 
-const center = [51.505, -0.09]
+const center = [0, 0]
 
 
-const Map = ({ height, width, isMobile, flights, positions }) => {
+const Map = ({
+  height,
+  isMobile,
+  flights,
+  positions,
+  horizontallStructure,
+  isLoadingFlights,
+}) => {
 
   const [flightInfo, setFligthInfo] = useState({code: '', passengers: [], plane: ''});
   const [showPlaneInfo, setShowPlaneInfo] = useState(false);
   const sortedPositions = reorderPositions(positions);
-
-
+  
   const setPlaneInfo = (plane) => {
     setFligthInfo(plane);
     setShowPlaneInfo(true)
     console.log(plane, showPlaneInfo)
   }
   
+  const styles = {
+    generalContainer: {
+      flex: horizontallStructure ? 2 : 1,
+      margin: 5,
+      height: horizontallStructure ? height - 30 : (height - 30)/2,
+    },
+    closeButton: { alignSelf: 'flex-end',},
+    map: {
+      height: horizontallStructure ? '100%' : (height - 200)/2,
+      borderRadius: 10,
+    },
+    loader: {
+      margin: 100, alignSelf: 'center', justifyContent: 'center',
+    },
+  };
   return (
-    <Container>
-      <Modal show={showPlaneInfo}>
+    <Container style={styles.generalContainer}>
+      <Modal show={showPlaneInfo} overflow backdrop onHide={() => setShowPlaneInfo(false)}>
+        <IconButton
+          onClick={() => setShowPlaneInfo(false)}
+          circle
+          icon={(
+            <IconRsuite icon="close"/>
+          )}
+          size="sm"
+          style={styles.closeButton}/>
         <Container>
           <h2>Pasajeros</h2>
-          {flightInfo.passengers.map(passenger => (
-            <p>{passenger.name} - {passenger.age}</p>
+          {flightInfo.passengers.map((passenger, index) => (
+            <p key={index.toString()}>- {passenger.name}: {passenger.age} años.</p>
           ))}
         </Container>
       </Modal>
-      <MapContainer center={center} zoom={1} minZoom={1} scrollWheelZoom={true} style={{height: height/2}}>
-        <TileLayer
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {Object.keys(sortedPositions).map((code, index) => {
-          const actualFlight = flights[code];
-          const line = [
-            actualFlight.origin,
-            actualFlight.destination,
-          ]
-          const path = { color: planeColors[(index % 20).toString()].theorical, weight: '1', dashArray: '2, 2', dashOffset: '2' };
-          return (
-            <Polyline key={code} pathOptions={path} positions={line} />
-            )
-        })}
-        {Object.keys(sortedPositions).map((code, index) => {
-          const flightPositions = sortedPositions[code];
-          const path = { color: planeColors[(index % 20).toString()].actual, width: '3' };
-          return (
-            <Polyline key={code} pathOptions={path} positions={flightPositions} />
-            )
+      <h2>Mapa de vuelos</h2>
+      <Container>
+        <p> (*) Presiona sobre un vuelo para ver su información</p>
+      </Container>
+      {isLoadingFlights ? (
+        <Container>
+          <Loader
+            content="Cargando mapa y vuelos"
+            style={styles.loader}  
+          />
+        </Container>
+      ) : (
+        <MapContainer center={center} zoom={0} minZoom={1} scrollWheelZoom={true} style={styles.map}>
+          <TileLayer
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          {Object.keys(sortedPositions).map((code, index) => {
+            const actualFlight = flights[code];
+            const line = [
+              actualFlight.origin,
+              actualFlight.destination,
+            ]
+            const path = {
+              color: planeColors[(index % 20).toString()].theorical,
+              weight: '1',
+              dashArray: '2, 2',
+              dashOffset: '2'
+            };
+            return (
+              <Polyline key={code} pathOptions={path} positions={line} />
+              )
           })}
-
-        {Object.keys(sortedPositions).map((code, index) => {
-          const flightPositions = sortedPositions[code];
-          const actualPosition = flightPositions[flightPositions.length - 1];
-          const actualFlight = flights[code];
-          return (
-            <Marker position={actualPosition} icon={myIcon} key={index.toString()}>
-              <Popup>
-                Vuelo {actualFlight.code}
-                <br />
-                {actualFlight.plane}
-                <br />
-                {actualFlight.seats}
-                <br />
-                <a onClick={() => setPlaneInfo(actualFlight)}>Ver más</a>
-              </Popup>
-            </Marker>
-            )
-          })}
-      </MapContainer>,
+          {Object.keys(sortedPositions).map((code, index) => {
+            const flightPositions = sortedPositions[code];
+            const path = { color: planeColors[(index % 20).toString()].actual, width: '3' };
+            return (
+              <Polyline key={code} pathOptions={path} positions={flightPositions} />
+              )
+            })}
+          {Object.keys(sortedPositions).map((code, index) => {
+            const flightPositions = sortedPositions[code];
+            const actualPosition = flightPositions[flightPositions.length - 1];
+            const actualFlight = flights[code];
+            return (
+              <Marker position={actualPosition} icon={myIcon} key={index.toString()}>
+                <Popup>
+                  <b>Vuelo {actualFlight.code}</b>
+                  <br />
+                  Avión: {actualFlight.plane}
+                  <br />
+                  Asientos: {actualFlight.seats}
+                  <br />
+                  <a onClick={() => setPlaneInfo(actualFlight)}>Ver más</a>
+                </Popup>
+              </Marker>
+              )
+            })}
+        </MapContainer>
+      )}
     </Container>
   )
 };
 
-const styles = {};
 
 export default Map;

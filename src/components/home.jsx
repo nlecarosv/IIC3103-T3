@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { io } from "socket.io-client";
 const ENDPOINT = "wss://tarea-3-websocket.2021-1.tallerdeintegracion.cl";
-import { Container } from 'rsuite';
+import { Container, Modal } from 'rsuite';
 import Map from './map';
 import Chat from './chat';
 import colors from '../styles/colors';
@@ -18,6 +18,7 @@ const Home = ({ height, width, isMobile }) => {
   const [newMessage, setNewMessage] = useState('');
   const [nickName, setNickName] = useState('User123');
   const debug = false;
+  const horizontallStructure = width > 999 && !isMobile;
   var socket;
 
   const handleMessage = () => {
@@ -106,18 +107,20 @@ const Home = ({ height, width, isMobile }) => {
   }, [flights]);
 
   return (
-    <Container >
+    <Container style={{padding: 10, width, overflowX: 'hidden'}}>
       {isLoadingFlights  ? (
         <Container>
           <h1>CARGANDO</h1>
         </Container>
       ): (
-        <Container>
+        <Container style={{flexDirection: width > 999 && !isMobile ? 'row' : 'column'}}>
           <Map
             height={height}
             width={width}
             positions={positions}
             flights={flights}
+            horizontallStructure={horizontallStructure}
+            isLoadingFlights={isLoadingFlights}
             />
           <Chat
             height={height}
@@ -128,9 +131,10 @@ const Home = ({ height, width, isMobile }) => {
             setNewMessage={setNewMessage}
             nickName={nickName}
             setNickName={setNickName}
+            horizontallStructure={horizontallStructure}
             />
         </Container>
-      )};
+      )}
     </Container>
   )
 };

@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { io } from "socket.io-client";
 const ENDPOINT = "wss://tarea-3-websocket.2021-1.tallerdeintegracion.cl";
-import { Container, Modal } from 'rsuite';
+import { Alert, Container, Modal } from 'rsuite';
 import Map from './map';
 import Chat from './chat';
 import colors from '../styles/colors';
@@ -45,10 +45,10 @@ const Home = ({ height, width, isMobile }) => {
         }
         setNewMessage('');
       } else {
-        console.log('RELLENAR MENSAJE')
+        Alert.error('Es necesario escribir algo')
       }
     } else {
-      console.log('RELLENAR AUTOR')
+      Alert.error('Es necesario escribir un nombre de usuario')
     }
   }
   const handlePositions = (message) => {

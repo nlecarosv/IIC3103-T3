@@ -16,12 +16,13 @@ const colors = {
   success: '#4CB944',
   clearGray: '#F8F8F8',
   transparent: 'transparent',
-  lightgray: 'lightgray',
+  lightgray: '#8e8e93',
   gradientLight: ['#FCF7F8', '#FCF7F8'],
   gradientDark: ['#343633', '#343633'],
   gradientMain: ['#5460B6', '#626CBC', '#5460B6'],
   selectorText: '#5c5c5c',
   bluePrimary: '#1675e0',
+  lightBlue: '#5fc9f8',
 }
 
 export default colors;

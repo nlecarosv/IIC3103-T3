@@ -4,15 +4,13 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, } from 'react-leaflet
 import { Icon } from 'leaflet'
 import '../styles/map.css';
 import planeColors from '../styles/plane-colors';
+import airplane from '../assets/images/airplane.png'
 
 const myIcon = new Icon({
-  iconUrl: '/airplane.png',
+  iconUrl: airplane,
   iconSize: [22, 22],
   iconAnchor: [1, 1],
   popupAnchor: [-3, -76],
-  // shadowUrl: 'my-icon-shadow.png',
-  // shadowSize: [68, 95],
-  // shadowAnchor: [22, 94]
 });
 
 const reorderPositions = (positionsToSort) => {

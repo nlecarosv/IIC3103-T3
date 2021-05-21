@@ -4,10 +4,9 @@
 import React, { useState, useEffect } from 'react';
 import { io } from "socket.io-client";
 const ENDPOINT = "wss://tarea-3-websocket.2021-1.tallerdeintegracion.cl";
-import { Alert, Container, Modal } from 'rsuite';
+import { Alert, Container, Notification } from 'rsuite';
 import Map from './map';
 import Chat from './chat';
-import colors from '../styles/colors';
 
 const Home = ({ height, width, isMobile }) => {
   const [isLoadingFlights, setIsLoadingFlights] = useState(true);
@@ -16,11 +15,23 @@ const Home = ({ height, width, isMobile }) => {
   const [positions, setPositions] = useState([]);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [nickName, setNickName] = useState('User123');
+  const [nickName, setNickName] = useState('Anónimo');
   const debug = false;
   const horizontallStructure = width > 999 && !isMobile;
   var socket;
 
+  const styles = {
+    main: { padding: 10, width, overflowX: 'hidden' },
+    generalContainer: {flexDirection: width > 999 && !isMobile ? 'row' : 'column'},
+  };
+
+  const renderMessageInformation = () => {
+    Notification.open({
+      title: 'Información',
+      description: 'Puedes cambiar el nombre de usuario en el primer input (donde aparece "Anónimo")',
+      duration: 7000,
+    });
+  }
   const handleMessage = () => {
     if (nickName.length > 0) {
       if (newMessage.length > 0) {
@@ -97,6 +108,7 @@ const Home = ({ height, width, isMobile }) => {
         disconnectSocket()
       }, 10000);
     }
+    renderMessageInformation();
     return () => disconnectSocket();
   }, []);
   
@@ -107,13 +119,13 @@ const Home = ({ height, width, isMobile }) => {
   }, [flights]);
 
   return (
-    <Container style={{padding: 10, width, overflowX: 'hidden'}}>
+    <Container style={styles.main}>
       {isLoadingFlights  ? (
         <Container>
           <h1>CARGANDO</h1>
         </Container>
       ): (
-        <Container style={{flexDirection: width > 999 && !isMobile ? 'row' : 'column'}}>
+        <Container style={styles.generalContainer}>
           <Map
             height={height}
             width={width}
@@ -139,6 +151,5 @@ const Home = ({ height, width, isMobile }) => {
   )
 };
 
-const styles = {};
 
 export default Home;

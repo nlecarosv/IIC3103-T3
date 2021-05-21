@@ -9,7 +9,6 @@ import moment from 'moment';
 const Chat = ({
   height,
   width,
-  isMobile,
   messages,
   setNewMessage,
   newMessage,
@@ -19,15 +18,56 @@ const Chat = ({
   isLoadingChat,
   horizontallStructure,
 }) => {
-  
   const styles = {
     generalContainer: {
       margin: 5,
-      // backgroundColor: 'green',
       height: horizontallStructure ? height - 30 : (height - 30)/2,
     },
+    borderContainer: {
+      flex: 1, 
+      backgroundColor: colors.black,
+      marginTop: horizontallStructure ? -15 : 0,
+      marginBottom: horizontallStructure ? -15 : 0,
+      paddingTop: horizontallStructure ? 15 : 10,
+      paddingBottom: horizontallStructure ? 15 : 10,
+      marginRight: horizontallStructure ? -15 : 0,
+      paddingRight: horizontallStructure ? 15 : 10,
+      paddingLeft: horizontallStructure ? 15 : 10,
+      borderRadius: horizontallStructure ? 0 : 10,
+      maxWidth: horizontallStructure ? width/ 2: width - 100 - 30,
+    },
+    chatTitle: { color: colors.white },
+    messages: {
+      padding: 20,
+      overflowY: 'scroll',
+      maxHeight: horizontallStructure ? height - 2*36 - 50 - 30 : height/2 - 2*36 - 50 - 30,
+      height: horizontallStructure ? height - 2*36 - 50 - 30 : height/2 - 2*36 - 50 - 30,
+    },
+    message: {
+      backgroundColor: colors.lightBlue,
+      borderRadius: 10,
+      wordWrap: 'break-word',
+      marginBottom: 5,
+      padding: 5,
+      marginLeft: 100,
+      justifySelf: 'start',
+      maxWidth: horizontallStructure ? width/ 3 + 20 : width - 100 - 30,
+    },
+    date: {flexDirection: 'row-reverse'},
+    textMessage: {wordWrap: 'break-word'},
+    otherMessage: {
+      backgroundColor: 'lightgray',
+      borderRadius: 10,
+      wordWrap: 'break-word',
+      marginBottom: 5,
+      padding: 5,
+      marginRight: 100,
+      maxWidth: horizontallStructure ? width/ 3 + 20 : width - 100 - 30,
+    },
+    otherMessageTitle: {flexDirection: 'row', justifyContent: 'space-between'},
+    otherName: {alignSelf: 'flex-end'},
+    input: {backgroundColor: colors.gray},
   };
-  console.log(width, width/ 3 + 40)
   return (
     <Container style={styles.generalContainer}>
       {isLoadingChat  ? (
@@ -35,21 +75,9 @@ const Chat = ({
           <h1>CARGANDO</h1>
         </Container>
       ): (
-        <Container style={{
-          flex: 1, 
-          backgroundColor: colors.black,
-          marginTop: horizontallStructure ? -15 : 0,
-          marginBottom: horizontallStructure ? -15 : 0,
-          paddingTop: horizontallStructure ? 15 : 10,
-          paddingBottom: horizontallStructure ? 15 : 10,
-          marginRight: horizontallStructure ? -15 : 0,
-          paddingRight: horizontallStructure ? 15 : 10,
-          paddingLeft: horizontallStructure ? 15 : 10,
-          borderRadius: horizontallStructure ? 0 : 10,
-          maxWidth: horizontallStructure ? width/ 2: width - 100 - 30,
-          }}>
+        <Container style={styles.borderContainer}>
           <Container>
-            <h2 style={{color: colors.white}}>Chat</h2>
+            <h2 style={styles.chatTitle}>Chat</h2>
           </Container>
           <InputGroup inside>
             <Input
@@ -61,63 +89,34 @@ const Chat = ({
               <Icon icon="user" />
             </InputGroup.Button>
           </InputGroup>
-          <Container style={{
-            // backgroundColor: 'gray',
-            padding: 20,
-            overflowY: 'scroll',
-            maxHeight: horizontallStructure ? height - 2*36 - 50 - 30 : height/2 - 2*36 - 50 - 30,
-            height: horizontallStructure ? height - 2*36 - 50 - 30 : height/2 - 2*36 - 50 - 30,
-            }}>
+          <Container style={styles.messages}>
             {messages.map((message, index) => {
               const date = moment(message.date).format('DD/MM/YYYY hh:mm')
               const { name: userName, message: textMessage } = message;
               if (message.name === nickName) {
                 return(
-                  <Container key={index.toString()} style={{
-                    backgroundColor: colors.lightBlue,
-                    borderRadius: 10,
-                    wordWrap: 'break-word',
-                    marginBottom: 5,
-                    padding: 5,
-                    marginLeft: 100,
-                    justifySelf: 'start',
-                    // maxHeight: 60,
-                    // width: horizontallStructure ? width/ 3 - 100 - 30 : width - 100 - 30,
-                  maxWidth: horizontallStructure ? width/ 3 + 20 : width - 100 - 30,
-                    // maxWidth: horizontallStructure ? width/ 3 : width - 100 - 30,
-
-                }}>
-                  <Container style={{flexDirection: 'row-reverse'}}>
+                  <Container key={index.toString()} style={styles.message}>
+                  <Container style={styles.date}>
                     <p>{date}</p>
                   </Container>
-                  <p style={{wordWrap: 'break-word'}}>{textMessage}</p>
+                  <p style={styles.textMessage}>{textMessage}</p>
                   </Container>
                 )
               } 
               return(
-                <Container key={index.toString()} style={{
-                  backgroundColor: 'lightgray',
-                  borderRadius: 10,
-                  wordWrap: 'break-word',
-                  marginBottom: 5,
-                  padding: 5,
-                  marginRight: 100,
-                  // maxHeight: 60,
-                  // width: horizontallStructure ? width/ 3 + 30 : width - 100 - 30,
-                  maxWidth: horizontallStructure ? width/ 3 + 20 : width - 100 - 30,
-                  }}>
-                  <Container style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                    <p style={{alignSelf: 'flex-end'}}><b>{userName}</b></p>
+                <Container key={index.toString()} style={styles.otherMessage}>
+                  <Container style={styles.otherMessageTitle}>
+                    <p style={styles.otherName}><b>{userName}</b></p>
                     <p>{date}</p>
                   </Container>
-                  <p style={{wordWrap: 'break-word'}}> {textMessage}</p>
+                  <p style={styles.textMessage}>{textMessage}</p>
                 </Container>
               )
             })}
           </Container>
           <InputGroup  inside style={styles}>
             <Input placeholder={'Mensaje'} value={newMessage} onChange={setNewMessage} onPressEnter={handleMessage}/>
-            <InputGroup.Button style={{backgroundColor: colors.gray}} onClick={handleMessage}> 
+            <InputGroup.Button style={styles.input} onClick={handleMessage}> 
               <Icon icon="send" />
             </InputGroup.Button>
           </InputGroup>

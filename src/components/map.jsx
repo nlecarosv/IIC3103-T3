@@ -37,14 +37,21 @@ const Map = ({
   isLoadingFlights,
 }) => {
 
-  const [flightInfo, setFligthInfo] = useState({code: '', passengers: [], plane: ''});
+  const [flightInfo, setFligthInfo] = useState({
+    code: '',
+    passengers: [],
+    plane: '',
+    origin: [0, 0],
+    destination: [0, 0],
+    seats: 0,
+    airline: ''
+  });
   const [showPlaneInfo, setShowPlaneInfo] = useState(false);
   const sortedPositions = reorderPositions(positions);
   
   const setPlaneInfo = (plane) => {
     setFligthInfo(plane);
     setShowPlaneInfo(true)
-    console.log(plane, showPlaneInfo)
   }
   
   const styles = {
@@ -61,6 +68,7 @@ const Map = ({
     loader: {
       margin: 100, alignSelf: 'center', justifyContent: 'center',
     },
+    center: {alignSelf: 'center'},
   };
   return (
     <Container style={styles.generalContainer}>
@@ -74,7 +82,16 @@ const Map = ({
           size="sm"
           style={styles.closeButton}/>
         <Container>
-          <h2>Pasajeros</h2>
+
+          <h2 style={styles.center}>Vuelo {flightInfo.code}</h2>
+          <p>Código: {flightInfo.code}</p>
+          <p>Avión: {flightInfo.plane}</p>
+          <p>Aerolínea: {flightInfo.airline}</p>
+          <p>Asientos: {flightInfo.seats}</p>
+          <p>Origen: ({flightInfo.origin[0]}, {flightInfo.origin[1]})</p>
+          <p>Destino: ({flightInfo.destination[0]}, {flightInfo.destination[1]})</p>
+          <br/>
+          <h3 style={styles.center}>Pasajeros</h3>
           {flightInfo.passengers.map((passenger, index) => (
             <p key={index.toString()}>- {passenger.name}: {passenger.age} años.</p>
           ))}
